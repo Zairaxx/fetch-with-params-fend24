@@ -1,9 +1,28 @@
 //Funktion för att hämta och returnera data från API.
 
 let getData = async (url) => {
-    let response = await fetch(url);
-    let json = await response.json();
-    return json
+    try{
+
+        let response = await fetch(url);
+        let json = await response.json();
+
+        if(json.length === 0){
+            throw new TypeError("Tom array. Data saknas");
+        } else {
+            return json
+        }
+    } catch (err){
+
+        if(err.name === "TypeError"){
+            console.log(err)
+            return err
+        } else if (err.name === "SyntaxError"){
+            console.log("Syntax fel - Utvecklarens fel")
+        }
+    } finally {
+        //cleanup code
+        console.log("getData har körts klart!")
+    }
 }
 
 // Hämta och rendera samtliga todos till DOM:en vid sidladdning
@@ -39,23 +58,30 @@ let getTodos = async () => {
     }
 
     //Gör ett anrop till URL + params
-    let todos = await getData("https://jsonplaceholder.typicode.com/todos?" + params)
 
-    //Skriv ut todos i DOM:en
-    let ul = document.querySelector("ul");
-    ul.innerHTML = "";
-
-    todos.forEach(todo => {
-        let li = document.createElement("li");
-        li.innerHTML = `
-        <p><strong>User ID:</strong>${todo.userId}</p>
-        <p><strong>ID:</strong>${todo.id}</p>
-        <p><strong>Title:</strong>${todo.title}</p>
-        <p><strong>Completed:</strong>${todo.completed}</p>
-        `;
-        ul.append(li);
-    })
-
+    try {
+        let todos = await getData("https://jsonplaceholder.typicode.com/todos?" + params)
+    
+        //Skriv ut todos i DOM:en
+        let ul = document.querySelector("ul");
+        ul.innerHTML = "";
+        todos.forEach(todo => {
+            let li = document.createElement("li");
+            li.innerHTML = `
+            <p><strong>User ID:</strong>${todo.userId}</p>
+            <p><strong>ID:</strong>${todo.id}</p>
+            <p><strong>Title:</strong>${todo.title}</p>
+            <p><strong>Completed:</strong>${todo.completed}</p>
+            `;
+            ul.append(li);
+    }) 
+    } catch {
+        console.log("Kunde ej loopa igenom array");
+        //Skriva ut error i DOM:en
+        let h2 = document.createElement("h2");
+        h2.innerText = "Inget data matchade dina kriterier!";
+        document.body.append(h2);
+    }
 }
 
 //Gör anrop vid knapptryck
