@@ -6,7 +6,7 @@ let getData = async (url) => {
     return json
 }
 
-// Rendera samtliga todos till DOM:en vid sidladdning
+// Hämta och rendera samtliga todos till DOM:en vid sidladdning
 let renderPage = async () => {
     let todos = await getData("https://jsonplaceholder.typicode.com/todos")
     let ul = document.querySelector("ul");
